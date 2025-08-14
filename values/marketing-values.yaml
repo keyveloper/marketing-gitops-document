@@ -4,7 +4,7 @@ replicaCount: 3
 
 image:
   repository: 679574531779.dkr.ecr.ap-northeast-2.amazonaws.com/marketing
-  tag: "latest"
+  tag: "1908e0a2c07c30671c10dddc312c6fdb870c1a10"
   pullPolicy: Always
 
 service:
