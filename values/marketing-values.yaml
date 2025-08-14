@@ -1,4 +1,4 @@
-# marketing (Main Backend) values
+# marketing (Front Server) values - ALB를 통한 외부 접근
 
 replicaCount: 3
 
@@ -9,12 +9,27 @@ image:
 
 service:
   type: ClusterIP
-  port: 8080
+  port: 80
   targetPort: 8080
+
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/subnets: subnet-010c69ca027646359,subnet-0a1d8d434c877200f
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health
+  hosts:
+    - host: ""
+      paths:
+        - path: /
+          pathType: Prefix
 
 spring:
   profiles:
-    active: "prod"
+    active: "aws"
 
 resources:
   limits:
