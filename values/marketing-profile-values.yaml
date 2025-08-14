@@ -4,7 +4,7 @@ replicaCount: 1
 
 image:
   repository: 679574531779.dkr.ecr.ap-northeast-2.amazonaws.com/marketing-profile
-  tag: "b0971724d26d7e0a430eda9264e703d57725ff93"
+  tag: "b4d04f6876bf789a5e68b133f2831d7c31a9be79"
   pullPolicy: Always
 
 service:
