@@ -14,7 +14,7 @@ service:
 
 spring:
   profiles:
-    active: "prod"
+    active: "aws"
 
 resources:
   limits:
