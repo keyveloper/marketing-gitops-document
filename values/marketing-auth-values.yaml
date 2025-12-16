@@ -4,7 +4,7 @@ replicaCount: 1
 
 image:
   repository: 679574531779.dkr.ecr.ap-northeast-2.amazonaws.com/marketing-auth
-  tag: "latest"
+  tag: "a6a660cdcf0bcad415bcb6f13aaf7f4119cd0fbe"
   pullPolicy: Always
 
 service:
