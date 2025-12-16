@@ -4,7 +4,7 @@ replicaCount: 1
 
 image:
   repository: 679574531779.dkr.ecr.ap-northeast-2.amazonaws.com/marketing-timeline
-  tag: "latest"
+  tag: "ede030ce2f2dc8a597a07af459c9534df4ba66c3"
   pullPolicy: Always
 
 service:
