@@ -1,5 +1,7 @@
 # marketing-auth values
 
+fullnameOverride: marketing-auth
+
 replicaCount: 1
 
 image:

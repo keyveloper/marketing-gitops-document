@@ -1,5 +1,7 @@
 # marketing-profile values
 
+fullnameOverride: marketing-profile
+
 replicaCount: 1
 
 image:

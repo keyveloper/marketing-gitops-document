@@ -1,5 +1,7 @@
 # marketing-image values
 
+fullnameOverride: marketing-image
+
 replicaCount: 1
 
 image:

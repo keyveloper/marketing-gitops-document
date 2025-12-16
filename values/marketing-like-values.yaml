@@ -1,5 +1,7 @@
 # marketing-like values
 
+fullnameOverride: marketing-like
+
 replicaCount: 1
 
 image:

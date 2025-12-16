@@ -1,5 +1,7 @@
 # marketing-timeline values
 
+fullnameOverride: marketing-timeline
+
 replicaCount: 1
 
 image:

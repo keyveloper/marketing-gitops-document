@@ -1,5 +1,7 @@
 # marketing (Front Server) values - ALB를 통한 외부 접근
 
+fullnameOverride: marketing
+
 replicaCount: 3
 
 image:

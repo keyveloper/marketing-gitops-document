@@ -1,5 +1,7 @@
 # marketing-noti values
 
+fullnameOverride: marketing-noti
+
 replicaCount: 1
 
 image:
