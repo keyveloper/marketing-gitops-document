@@ -1,0 +1,70 @@
+name: Marketing EKS lab verification
+run-name: EKS lab verify ${{ inputs.cluster_name }}
+on:
+  workflow_dispatch:
+    inputs:
+      cluster_name:
+        description: Dedicated marketing-eks-lab cluster name
+        required: true
+        type: string
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: marketing-eks-verify-${{ inputs.cluster_name }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      AWS_REGION: ap-northeast-2
+      TARGET_CLUSTER: ${{ inputs.cluster_name }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Validate dedicated lab target
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$TARGET_CLUSTER" =~ ^marketing-eks-lab-[a-z0-9-]+$ ]] || exit 1
+      - name: Use temporary read-only AWS identity
+        uses: aws-actions/configure-aws-credentials@cabfdba3510de1431bac9dba27511d97497fc100 # v5
+        with:
+          role-to-assume: arn:aws:iam::359554404849:role/marketing-eks-lab-github-view
+          role-session-name: marketing-eks-verify
+          role-duration-seconds: 900
+          aws-region: ap-northeast-2
+          allowed-account-ids: '359554404849'
+      - name: Verify EKS nodes and immutable image metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          aws sts get-caller-identity --query '{account:Account}' > evidence/account.json
+          aws eks describe-cluster --name "$TARGET_CLUSTER" --query 'cluster.{name:name,status:status,version:version,arn:arn,project:tags.Project}' > evidence/cluster.json
+          aws eks list-nodegroups --cluster-name "$TARGET_CLUSTER" > evidence/nodegroups.json
+          for group in public private; do
+            aws eks describe-nodegroup --cluster-name "$TARGET_CLUSTER" --nodegroup-name "$group" --query 'nodegroup.{name:nodegroupName,status:status,desired:scalingConfig.desiredSize,instances:instanceTypes}' > "evidence/$group.json"
+          done
+          aws ecr describe-images --repository-name "$TARGET_CLUSTER" --query 'imageDetails[].{tags:imageTags,digest:imageDigest,pushedAt:imagePushedAt,size:imageSizeInBytes}' > evidence/images.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('evidence')
+          load=lambda name:json.loads((root/name).read_text())
+          assert load('account.json')['account']=='359554404849'
+          assert load('cluster.json')['status']=='ACTIVE'
+          assert load('cluster.json')['project']=='marketing-eks-lab'
+          for name in ['public.json','private.json']:
+              group=load(name)
+              assert group['status']=='ACTIVE' and group['desired']==2, group
+          assert len(load('images.json'))>=9
+          print('Verified account, ACTIVE EKS, public2/private2 nodes, and at least nine immutable images')
+          PY
+      - name: Preserve scoped verification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: eks-lab-verification
+          path: evidence/
+          retention-days: 1
